@@ -71,6 +71,7 @@ export function Sanctuary() {
       if (bar.current) bar.current.style.transform = `scaleX(${p})`;
     },
     !still,
+    [height],
   );
 
   return (

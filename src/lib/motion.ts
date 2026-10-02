@@ -11,22 +11,43 @@ const ticks = new Set<Tick>();
 let raf = 0;
 let dirty = true;
 
-function frame() {
+/** Continuous per-frame callbacks (e.g. the drifting wall), driven by the same single rAF. */
+type Loop = (now: number) => void;
+const loops = new Set<Loop>();
+
+function frame(now: number) {
   raf = 0;
-  if (!dirty) return;
-  dirty = false;
-  // One failing effect must never stop the others (or leave the page stuck).
-  ticks.forEach((t) => {
+  if (dirty) {
+    dirty = false;
+    // One failing effect must never stop the others (or leave the page stuck).
+    ticks.forEach((t) => {
+      try {
+        t();
+      } catch {
+        /* the page stays readable without this effect */
+      }
+    });
+  }
+  loops.forEach((l) => {
     try {
-      t();
+      l(now);
     } catch {
-      /* the page stays readable without this effect */
+      /* ignore */
     }
   });
+  if (loops.size) raf = requestAnimationFrame(frame);
 }
 function request() {
   dirty = true;
   if (!raf) raf = requestAnimationFrame(frame);
+}
+/** Run `fn` every frame until unsubscribed. Shares the page's one rAF instead of starting another. */
+export function subscribeLoop(fn: Loop) {
+  loops.add(fn);
+  if (!raf) raf = requestAnimationFrame(frame);
+  return () => {
+    loops.delete(fn);
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -109,11 +130,18 @@ export const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(
  * Progress of a tall "scrollytelling" section: 0 when its top reaches the top
  * of the viewport, 1 when its bottom reaches the bottom of the viewport.
  */
-export function useSectionProgress(ref: RefObject<HTMLElement | null>, cb: (p: number) => void, enabled = true) {
+export function useSectionProgress(
+  ref: RefObject<HTMLElement | null>,
+  cb: (p: number) => void,
+  enabled = true,
+  /** Values the callback's output depends on besides progress (e.g. measured geometry). */
+  deps: readonly unknown[] = [],
+) {
   const cbRef = useRef(cb);
   cbRef.current = cb;
   useEffect(() => {
     if (!enabled) return;
+    let last = -1;
     return subscribe(() => {
       const el = ref.current;
       if (!el) return;
@@ -121,9 +149,13 @@ export function useSectionProgress(ref: RefObject<HTMLElement | null>, cb: (p: n
       const vh = stableVh();
       const total = r.height - vh;
       const p = total > 0 ? clamp(-r.top / total) : r.top < 0 ? 1 : 0;
+      // Parked before/after the section: nothing changes, so don't rewrite styles on every touch-scroll frame.
+      if (p === last && (p === 0 || p === 1)) return;
+      last = p;
       cbRef.current(p);
     });
-  }, [ref, enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref, enabled, ...deps]);
 }
 
 /**

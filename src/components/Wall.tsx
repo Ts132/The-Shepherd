@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { photos, type Photo } from '../content/photos';
-import { subscribeViewport, useMediaQuery, useReducedMotion } from '../lib/motion';
+import { subscribeLoop, subscribeViewport, useMediaQuery, useReducedMotion } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
 import { Echo } from './Echo';
 import { Shot } from './Shot';
@@ -36,6 +36,7 @@ export function Wall() {
   const { t } = usePrefs();
   const reduced = useReducedMotion();
   const compact = useMediaQuery('(max-width: 759px)');
+  const touch = useMediaQuery('(hover: none), (pointer: coarse)');
   return (
     <section id="wall" className={`wall ${reduced ? 'wall--still' : ''}`} aria-labelledby="wall-title">
       <header className="wall__head">
@@ -47,14 +48,26 @@ export function Wall() {
       </header>
       <div className="wall__rows">
         {rows.map((r, i) => (
-          <Row key={i} photos={compact ? r.slice(0, PER_ROW_COMPACT) : r} index={i} reduced={reduced} compact={compact} />
+          <Row key={i} photos={compact ? r.slice(0, PER_ROW_COMPACT) : r} index={i} reduced={reduced} compact={compact} touch={touch} />
         ))}
       </div>
     </section>
   );
 }
 
-function Row({ photos: list, index, reduced, compact }: { photos: Photo[]; index: number; reduced: boolean; compact: boolean }) {
+function Row({
+  photos: list,
+  index,
+  reduced,
+  compact,
+  touch,
+}: {
+  photos: Photo[];
+  index: number;
+  reduced: boolean;
+  compact: boolean;
+  touch: boolean;
+}) {
   const track = useRef<HTMLDivElement>(null);
   const row = useRef<HTMLDivElement>(null);
   const { dir } = usePrefs();
@@ -71,8 +84,8 @@ function Row({ photos: list, index, reduced, compact }: { photos: Photo[]; index
     let boost = 0;
     let lastY = window.scrollY;
     let lastT = performance.now();
-    let raf = 0;
     let visible = false;
+    let off: (() => void) | null = null;
     let half = 0;
     // Read the loop length once (and when sizes change) instead of forcing layout every frame.
     const measure = () => {
@@ -86,15 +99,16 @@ function Row({ photos: list, index, reduced, compact }: { photos: Photo[]; index
     const minGap = compact ? 30 : 0;
 
     const loop = (now: number) => {
-      raf = 0;
-      if (!visible || document.hidden) return;
-      if (now - lastT < minGap) {
-        raf = requestAnimationFrame(loop);
-        return;
-      }
+      if (document.hidden || now - lastT < minGap) return;
       const dt = Math.min(64, now - lastT);
       lastT = now;
       speed += (target - speed) * 0.06;
+      if (!touch) {
+        // Pointer devices: scrolling the page nudges the drift. Touch scrolling never touches it.
+        const y = window.scrollY;
+        boost = Math.max(-1.2, Math.min(1.2, boost + (y - lastY) * 0.004));
+        lastY = y;
+      }
       boost *= 0.92;
       x += baseDir * (0.035 * speed + boost) * dt;
       if (half > 0) {
@@ -102,49 +116,43 @@ function Row({ photos: list, index, reduced, compact }: { photos: Photo[]; index
         if (x > 0) x -= half;
       }
       tr.style.transform = `translate3d(${x}px,0,0)`;
-      raf = requestAnimationFrame(loop);
     };
-    const start = () => {
-      lastT = performance.now();
-      if (!raf) raf = requestAnimationFrame(loop);
-    };
-    const onScroll = () => {
-      const y = window.scrollY;
-      boost = Math.max(-1.2, Math.min(1.2, boost + (y - lastY) * 0.004));
-      lastY = y;
-    };
+    // Rows only join the page's shared frame loop while they are on screen.
     const io = new IntersectionObserver(
       ([e]) => {
         visible = e.isIntersecting;
-        if (visible) start();
+        if (visible && !off) {
+          lastT = performance.now();
+          lastY = window.scrollY;
+          off = subscribeLoop(loop);
+        } else if (!visible && off) {
+          off();
+          off = null;
+        }
       },
       { rootMargin: '120px 0px' },
     );
-    const onVis = () => {
-      if (!document.hidden && visible) start();
-    };
-    document.addEventListener('visibilitychange', onVis);
     io.observe(rw);
-    window.addEventListener('scroll', onScroll, { passive: true });
+    // Hover/focus pause is for pointer devices only: on touch it would leave a row stuck after a tap.
     const pause = () => (target = 0);
     const resume = () => (target = 1);
-    rw.addEventListener('pointerenter', pause);
-    rw.addEventListener('pointerleave', resume);
-    rw.addEventListener('focusin', pause);
-    rw.addEventListener('focusout', resume);
+    if (!touch) {
+      rw.addEventListener('pointerenter', pause);
+      rw.addEventListener('pointerleave', resume);
+      rw.addEventListener('focusin', pause);
+      rw.addEventListener('focusout', resume);
+    }
     return () => {
       io.disconnect();
       ro.disconnect();
       offViewport();
-      document.removeEventListener('visibilitychange', onVis);
-      cancelAnimationFrame(raf);
-      window.removeEventListener('scroll', onScroll);
+      off?.();
       rw.removeEventListener('pointerenter', pause);
       rw.removeEventListener('pointerleave', resume);
       rw.removeEventListener('focusin', pause);
       rw.removeEventListener('focusout', resume);
     };
-  }, [reduced, index, dir, compact]);
+  }, [reduced, index, dir, compact, touch]);
 
   const items = (copy: number) =>
     list.map((p, i) => (

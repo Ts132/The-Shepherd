@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { byId, src } from '../content/photos';
-import { easeInOut, lerp, range, stableVh, stableVw, subscribeViewport, useReducedMotion, useSectionProgress } from '../lib/motion';
+import { easeInOut, lerp, range, stableVh, stableVw, subscribeViewport, useMediaQuery, useReducedMotion, useSectionProgress } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
 
 const HERO = byId('w726');
@@ -44,6 +44,8 @@ export function Hero() {
   const caption = useRef<HTMLParagraphElement>(null);
   const shade = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  // Touch devices: the photo keeps one fixed full-screen box and only the clip opens, so no layout work per scroll frame.
+  const light = useMediaQuery('(max-width: 759px), (pointer: coarse)');
   const { t, lang } = usePrefs();
   const [geo, setGeo] = useState<Geo | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -81,16 +83,18 @@ export function Hero() {
       const settle = range(p, 0.58, 1);
       const im = imgInner.current;
       if (im) {
-        // The photo's own box grows from the arch to the whole screen, so the
-        // arch always shows the full composition rather than a zoomed crop.
-        const bx = lerp(x0 - iw * 0.08, 0, e);
-        const bw = lerp(iw * 1.16, W, e);
-        const bt = lerp(by - ih, 0, e);
-        const bh = lerp(ih, H, e);
-        im.style.left = `${bx}px`;
-        im.style.top = `${bt}px`;
-        im.style.width = `${bw}px`;
-        im.style.height = `${bh}px`;
+        if (!light) {
+          // The photo's own box grows from the arch to the whole screen, so the
+          // arch always shows the full composition rather than a zoomed crop.
+          const bx = lerp(x0 - iw * 0.08, 0, e);
+          const bw = lerp(iw * 1.16, W, e);
+          const bt = lerp(by - ih, 0, e);
+          const bh = lerp(ih, H, e);
+          im.style.left = `${bx}px`;
+          im.style.top = `${bt}px`;
+          im.style.width = `${bw}px`;
+          im.style.height = `${bh}px`;
+        }
         im.style.transform = `scale(${1 + settle * 0.06})`;
       }
       if (arches.current) {
@@ -112,6 +116,7 @@ export function Hero() {
       }
     },
     !reduced,
+    [geo, light],
   );
 
   const paths = geo
@@ -126,14 +131,15 @@ export function Hero() {
   return (
     <section
       ref={section}
-      className={`hero ${loaded ? 'is-loaded' : ''} ${imgReady ? 'is-img' : ''} ${reduced ? 'hero--still' : ''}`}
+      className={`hero ${loaded ? 'is-loaded' : ''} ${imgReady ? 'is-img' : ''} ${light ? 'hero--light' : ''} ${reduced ? 'hero--still' : ''}`}
       aria-label={t.hero.label}
     >
       <div className="hero__stage">
         <div className="hero__img" ref={img} style={{ clipPath: initialClip }}>
           <img
+            key={light ? 'light' : 'full'}
             ref={imgInner}
-            style={geo ? { left: geo.cx - geo.iw * 0.58, top: geo.by - geo.ih, width: geo.iw * 1.16, height: geo.ih } : undefined}
+            style={light ? { left: 0, top: 0, width: '100%', height: '100%' } : geo ? { left: geo.cx - geo.iw * 0.58, top: geo.by - geo.ih, width: geo.iw * 1.16, height: geo.ih } : undefined}
             src={src(HERO, 'l')}
             alt={t.hero.alt}
             fetchPriority="high"

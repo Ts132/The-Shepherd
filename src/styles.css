@@ -543,6 +543,9 @@ a {
   position: relative;
   height: 320vh;
 }
+.hero--light {
+  height: 240vh; /* touch: a shorter pinned stretch, so the page keeps moving under the finger */
+}
 .hero__stage {
   position: sticky;
   top: 0;
@@ -918,13 +921,9 @@ a {
 .sanct--still .sanct__stage {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
 }
 .sanct--still .sanct__track {
   will-change: auto;
-}
-.sanct--still .sanct__item {
-  scroll-snap-align: center;
 }
 .sanct--still .sanct__progress {
   display: none;
@@ -1451,6 +1450,9 @@ a {
 }
 .wall--still .wall__row {
   overflow-x: auto;
+}
+.wall:not(.wall--still) .wall__row {
+  touch-action: pan-y; /* rows only drift on their own: every touch gesture on them is a vertical page scroll */
 }
 @media (max-width: 759px) {
   .wall__item .shot {
