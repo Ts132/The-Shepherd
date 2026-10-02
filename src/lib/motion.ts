@@ -15,15 +15,78 @@ function frame() {
   raf = 0;
   if (!dirty) return;
   dirty = false;
-  ticks.forEach((t) => t());
+  // One failing effect must never stop the others (or leave the page stuck).
+  ticks.forEach((t) => {
+    try {
+      t();
+    } catch {
+      /* the page stays readable without this effect */
+    }
+  });
 }
 function request() {
   dirty = true;
   if (!raf) raf = requestAnimationFrame(frame);
 }
+
+/* ------------------------------------------------------------------ */
+/* Stable viewport height.                                             */
+/* Sticky stages are sized with CSS `100svh` (the small viewport, i.e. */
+/* the browser UI fully shown). `innerHeight` changes as a mobile URL  */
+/* bar collapses, so JS must measure the same unit the CSS uses.       */
+/* ------------------------------------------------------------------ */
+let probe: HTMLDivElement | null = null;
+let vhCache = 0;
+/** Height of 100svh in px (falls back to innerHeight where svh is unsupported). */
+export function stableVh() {
+  if (vhCache) return vhCache;
+  if (!probe) {
+    probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText =
+      'position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none';
+    document.body.appendChild(probe);
+  }
+  vhCache = probe.offsetHeight || window.innerHeight;
+  return vhCache;
+}
+/** Width the page is laid out in (excludes a desktop scrollbar). */
+export const stableVw = () => document.documentElement.clientWidth || window.innerWidth;
+
+const viewportSubs = new Set<() => void>();
+let viewportSig = '';
+function viewportChanged(force = false) {
+  vhCache = 0;
+  const sig = `${stableVw()}x${stableVh()}`;
+  if (!force && sig === viewportSig) return; // e.g. the URL bar moving: nothing to re-measure
+  viewportSig = sig;
+  viewportSubs.forEach((f) => {
+    try {
+      f();
+    } catch {
+      /* ignore */
+    }
+  });
+  request();
+}
+/**
+ * Calls `cb` when the layout size really changed, and again once fonts and
+ * images have finished loading (late-arriving assets change layout).
+ */
+export function subscribeViewport(cb: () => void) {
+  viewportSubs.add(cb);
+  return () => {
+    viewportSubs.delete(cb);
+  };
+}
+
 if (typeof window !== 'undefined') {
   window.addEventListener('scroll', request, { passive: true });
-  window.addEventListener('resize', request);
+  window.addEventListener('resize', () => viewportChanged());
+  window.addEventListener('orientationchange', () => viewportChanged());
+  window.addEventListener('load', () => viewportChanged(true));
+  document.fonts?.ready.then(() => viewportChanged(true)).catch(() => {});
+  document.fonts?.addEventListener?.('loadingdone', () => viewportChanged(true));
 }
 
 export function subscribe(t: Tick) {
@@ -55,8 +118,10 @@ export function useSectionProgress(ref: RefObject<HTMLElement | null>, cb: (p: n
       const el = ref.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const total = r.height - window.innerHeight;
-      cbRef.current(total > 0 ? clamp(-r.top / total) : r.top < 0 ? 1 : 0);
+      const vh = stableVh();
+      const total = r.height - vh;
+      const p = total > 0 ? clamp(-r.top / total) : r.top < 0 ? 1 : 0;
+      cbRef.current(p);
     });
   }, [ref, enabled]);
 }

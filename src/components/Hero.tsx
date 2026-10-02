@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { byId, src } from '../content/photos';
-import { easeInOut, lerp, range, useReducedMotion, useSectionProgress } from '../lib/motion';
+import { easeInOut, lerp, range, stableVh, stableVw, subscribeViewport, useReducedMotion, useSectionProgress } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
 
 const HERO = byId('w726');
@@ -17,8 +17,9 @@ interface Geo {
 }
 
 function measure(): Geo {
-  const W = window.innerWidth;
-  const H = window.innerHeight;
+  // Same units as the CSS stage (100svh): immune to the mobile URL bar moving.
+  const W = stableVw();
+  const H = stableVh();
   const mobile = W < 760;
   const iw = mobile ? Math.min(W * 0.44, H * 0.3) : Math.min(W * 0.26, H * 0.34);
   const ih = iw * 1.5;
@@ -46,26 +47,22 @@ export function Hero() {
   const { t, lang } = usePrefs();
   const [geo, setGeo] = useState<Geo | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [imgReady, setImgReady] = useState(false);
 
   useLayoutEffect(() => {
-    const on = () => setGeo(measure());
-    on();
-    // Mobile browsers resize the viewport as the URL bar hides: only re-measure on width change.
-    let lastW = window.innerWidth;
-    const onResize = () => {
-      if (window.innerWidth !== lastW || Math.abs(window.innerHeight - (geo?.H ?? 0)) > 160) {
-        lastW = window.innerWidth;
-        on();
-      }
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setGeo(measure());
+    // Re-measure only when the layout size really changes, and once fonts/assets have settled.
+    return subscribeViewport(() => setGeo(measure()));
   }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 60);
-    return () => clearTimeout(t);
+    // The photo fades in when decoded; never wait longer than 1.5s for it.
+    const fallback = setTimeout(() => setImgReady(true), 1500);
+    return () => {
+      clearTimeout(t);
+      clearTimeout(fallback);
+    };
   }, []);
 
   useSectionProgress(
@@ -129,7 +126,7 @@ export function Hero() {
   return (
     <section
       ref={section}
-      className={`hero ${loaded ? 'is-loaded' : ''} ${reduced ? 'hero--still' : ''}`}
+      className={`hero ${loaded ? 'is-loaded' : ''} ${imgReady ? 'is-img' : ''} ${reduced ? 'hero--still' : ''}`}
       aria-label={t.hero.label}
     >
       <div className="hero__stage">
@@ -141,6 +138,7 @@ export function Hero() {
             alt={t.hero.alt}
             fetchPriority="high"
             decoding="async"
+            onLoad={() => setImgReady(true)}
           />
           <div className="hero__shade" ref={shade} />
         </div>

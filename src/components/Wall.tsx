@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { photos, type Photo } from '../content/photos';
-import { useReducedMotion } from '../lib/motion';
+import { subscribeViewport, useMediaQuery, useReducedMotion } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
 import { Echo } from './Echo';
 import { Shot } from './Shot';
@@ -25,6 +25,8 @@ const pool = shuffle(
 );
 const rows: Photo[][] = Array.from({ length: ROWS }, (_, r) => pool.slice(r * PER_ROW, (r + 1) * PER_ROW));
 const everything = rows.flat();
+/** Phones draw fewer photos per row: the full set stays reachable in the viewer and the archive. */
+const PER_ROW_COMPACT = 12;
 
 /**
  * Three rows of photographs drifting past in alternate directions. Scrolling the
@@ -33,6 +35,7 @@ const everything = rows.flat();
 export function Wall() {
   const { t } = usePrefs();
   const reduced = useReducedMotion();
+  const compact = useMediaQuery('(max-width: 759px)');
   return (
     <section id="wall" className={`wall ${reduced ? 'wall--still' : ''}`} aria-labelledby="wall-title">
       <header className="wall__head">
@@ -44,14 +47,14 @@ export function Wall() {
       </header>
       <div className="wall__rows">
         {rows.map((r, i) => (
-          <Row key={i} photos={r} index={i} reduced={reduced} />
+          <Row key={i} photos={compact ? r.slice(0, PER_ROW_COMPACT) : r} index={i} reduced={reduced} compact={compact} />
         ))}
       </div>
     </section>
   );
 }
 
-function Row({ photos: list, index, reduced }: { photos: Photo[]; index: number; reduced: boolean }) {
+function Row({ photos: list, index, reduced, compact }: { photos: Photo[]; index: number; reduced: boolean; compact: boolean }) {
   const track = useRef<HTMLDivElement>(null);
   const row = useRef<HTMLDivElement>(null);
   const { dir } = usePrefs();
@@ -70,13 +73,27 @@ function Row({ photos: list, index, reduced }: { photos: Photo[]; index: number;
     let lastT = performance.now();
     let raf = 0;
     let visible = false;
+    let half = 0;
+    // Read the loop length once (and when sizes change) instead of forcing layout every frame.
+    const measure = () => {
+      half = tr.scrollWidth / 2;
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(tr);
+    const offViewport = subscribeViewport(measure);
+    // ~30fps on phones: half the work, still smooth for a slow drift.
+    const minGap = compact ? 30 : 0;
 
     const loop = (now: number) => {
       raf = 0;
-      if (!visible) return;
+      if (!visible || document.hidden) return;
+      if (now - lastT < minGap) {
+        raf = requestAnimationFrame(loop);
+        return;
+      }
       const dt = Math.min(64, now - lastT);
       lastT = now;
-      const half = tr.scrollWidth / 2;
       speed += (target - speed) * 0.06;
       boost *= 0.92;
       x += baseDir * (0.035 * speed + boost) * dt;
@@ -96,10 +113,17 @@ function Row({ photos: list, index, reduced }: { photos: Photo[]; index: number;
       boost = Math.max(-1.2, Math.min(1.2, boost + (y - lastY) * 0.004));
       lastY = y;
     };
-    const io = new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
-      if (visible) start();
-    });
+    const io = new IntersectionObserver(
+      ([e]) => {
+        visible = e.isIntersecting;
+        if (visible) start();
+      },
+      { rootMargin: '120px 0px' },
+    );
+    const onVis = () => {
+      if (!document.hidden && visible) start();
+    };
+    document.addEventListener('visibilitychange', onVis);
     io.observe(rw);
     window.addEventListener('scroll', onScroll, { passive: true });
     const pause = () => (target = 0);
@@ -110,6 +134,9 @@ function Row({ photos: list, index, reduced }: { photos: Photo[]; index: number;
     rw.addEventListener('focusout', resume);
     return () => {
       io.disconnect();
+      ro.disconnect();
+      offViewport();
+      document.removeEventListener('visibilitychange', onVis);
       cancelAnimationFrame(raf);
       window.removeEventListener('scroll', onScroll);
       rw.removeEventListener('pointerenter', pause);
@@ -117,7 +144,7 @@ function Row({ photos: list, index, reduced }: { photos: Photo[]; index: number;
       rw.removeEventListener('focusin', pause);
       rw.removeEventListener('focusout', resume);
     };
-  }, [reduced, index, dir]);
+  }, [reduced, index, dir, compact]);
 
   const items = (copy: number) =>
     list.map((p, i) => (

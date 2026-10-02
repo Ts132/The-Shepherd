@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { byId } from '../content/photos';
-import { useReducedMotion, useSectionProgress } from '../lib/motion';
+import { stableVh, stableVw, subscribeViewport, useMediaQuery, useReducedMotion, useSectionProgress } from '../lib/motion';
 import { Shot } from './Shot';
 import { Echo } from './Echo';
 import { usePrefs } from '../lib/prefs';
@@ -27,25 +27,42 @@ export function Sanctuary() {
   const [height, setHeight] = useState<number | undefined>(undefined);
   const dist = useRef(0);
   const reduced = useReducedMotion();
+  // Phones get a native swipeable strip instead of a pinned, scroll-driven track.
+  const compact = useMediaQuery('(max-width: 759px)');
+  const still = reduced || compact;
   const { t, lang, dir } = usePrefs();
   const sign = dir === 'rtl' ? 1 : -1;
 
   useLayoutEffect(() => {
-    if (reduced) return;
+    if (still) {
+      if (track.current) track.current.style.transform = '';
+      return;
+    }
+    const el = track.current;
+    let queued = 0;
     const measure = () => {
+      queued = 0;
       if (!track.current) return;
-      dist.current = Math.max(0, track.current.scrollWidth - window.innerWidth);
-      setHeight(dist.current + window.innerHeight);
+      dist.current = Math.max(0, track.current.scrollWidth - stableVw());
+      setHeight(dist.current + stableVh());
+    };
+    // Coalesce bursts (several images/fonts finishing together) into one measurement.
+    const schedule = () => {
+      if (!queued) queued = requestAnimationFrame(measure);
     };
     measure();
-    const ro = new ResizeObserver(measure);
-    if (track.current) ro.observe(track.current);
-    window.addEventListener('resize', measure);
+    const ro = new ResizeObserver(schedule);
+    if (el) ro.observe(el);
+    const off = subscribeViewport(schedule);
+    // Late-loading photos can change the track's width: measure again when each one lands.
+    el?.addEventListener('load', schedule, true);
     return () => {
+      cancelAnimationFrame(queued);
       ro.disconnect();
-      window.removeEventListener('resize', measure);
+      off();
+      el?.removeEventListener('load', schedule, true);
     };
-  }, [reduced, lang]);
+  }, [still, lang]);
 
   useSectionProgress(
     section,
@@ -53,15 +70,15 @@ export function Sanctuary() {
       if (track.current) track.current.style.transform = `translate3d(${sign * p * dist.current}px,0,0)`;
       if (bar.current) bar.current.style.transform = `scaleX(${p})`;
     },
-    !reduced,
+    !still,
   );
 
   return (
     <section
       id="sanctuary"
       ref={section}
-      className={`sanct ${reduced ? 'sanct--still' : ''}`}
-      style={{ height: reduced ? undefined : height }}
+      className={`sanct ${still ? 'sanct--still' : ''}`}
+      style={{ height: still ? undefined : height }}
       aria-labelledby="sanct-title"
     >
       <div className="sanct__stage">

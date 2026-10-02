@@ -225,6 +225,15 @@ a {
   mix-blend-mode: multiply;
 }
 
+/* A fixed blend layer over scrolling content is costly on phones: use plain low-opacity noise there. */
+@media (max-width: 759px), (hover: none) {
+  .grain,
+  :root[data-theme='light'] .grain {
+    mix-blend-mode: normal;
+    opacity: 0.035;
+  }
+}
+
 /* Photo button ------------------------------------------------------------ */
 .shot {
   position: relative;
@@ -551,7 +560,7 @@ a {
   opacity: 0;
   transition: opacity 1.4s var(--ease) 1.1s;
 }
-.hero.is-loaded .hero__img {
+.hero.is-img .hero__img {
   opacity: 1;
 }
 .hero__img img {
@@ -906,10 +915,24 @@ a {
   padding: 16vh 0;
   overflow-x: auto;
 }
+.sanct--still .sanct__stage {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+}
+.sanct--still .sanct__track {
+  will-change: auto;
+}
+.sanct--still .sanct__item {
+  scroll-snap-align: center;
+}
 .sanct--still .sanct__progress {
   display: none;
 }
 @media (max-width: 759px) {
+  .sanct--still .sanct__stage {
+    padding: 12vh 0 10vh;
+  }
   .sanct__item--arch {
     --h: 58svh;
     --w: calc(58svh * 0.68);
@@ -1430,6 +1453,12 @@ a {
   overflow-x: auto;
 }
 @media (max-width: 759px) {
+  .wall__item .shot {
+    box-shadow: 0 10px 20px -12px rgba(0, 0, 0, 0.55);
+  }
+  .wall__row--2 .wall__item .shot {
+    outline-width: 3px;
+  }
   .wall__row--1 {
     --rh: 22vh;
   }
