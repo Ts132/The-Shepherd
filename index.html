@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>The Shepherd | Coptic woodwork for the churches of Egypt</title>
+    <meta
+      name="description"
+      content="The Shepherd (الراعي): Coptic woodwork for the churches of Egypt. Iconostases, altars, lecterns, ceilings, doors and crosses, carved in wood."
+    />
+    <meta name="theme-color" content="#1a120c" />
+    <meta property="og:title" content="The Shepherd | Coptic woodwork" />
+    <meta property="og:description" content="Iconostases, altars, lecterns, ceilings, doors and crosses for Coptic churches." />
+    <meta property="og:image" content="/images/w031-l.webp" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href="/fonts/marcellus.woff" as="font" type="font/woff" crossorigin />
+    <link rel="preload" as="image" href="/images/w031-l.webp" fetchpriority="high" />
+    <script>
+      // Apply the saved language and theme before first paint, so the page never flashes the wrong one.
+      (function () {
+        var d = document.documentElement, l = null, t = null;
+        try { l = localStorage.getItem('shepherd-lang'); t = localStorage.getItem('shepherd-theme'); } catch (e) {}
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'ar' || q === 'en') l = q;
+        if (!l) l = (navigator.language || '').toLowerCase().indexOf('ar') === 0 ? 'ar' : 'en';
+        if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        d.lang = l; d.dir = l === 'ar' ? 'rtl' : 'ltr'; d.dataset.theme = t;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <p style="padding: 2rem; color: #ede3d1; font-family: serif">
+        The Shepherd: Coptic woodwork for the churches of Egypt. Please enable JavaScript to browse the gallery.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

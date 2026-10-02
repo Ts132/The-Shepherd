@@ -1,0 +1,301 @@
+/**
+ * Every piece of text on the site, in English and Arabic.
+ * Keys are grouped by section. `{n}` style tokens are filled in by `fmt()`.
+ */
+export type Lang = 'en' | 'ar';
+
+const en = {
+  meta: {
+    title: 'The Shepherd | Coptic woodwork for the churches of Egypt',
+    description:
+      'The Shepherd (الراعي): Coptic woodwork for the churches of Egypt. Iconostases, altars, lecterns, ceilings, doors, icons and crosses.',
+  },
+  brand: { name: 'The Shepherd', descriptor: 'For Coptic Works' },
+  ui: {
+    skip: 'Skip to the archive',
+    sections: 'Sections',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    langSwitch: 'العربية',
+    langSwitchLabel: 'اعرض الموقع بالعربية',
+    toLight: 'Switch to light theme',
+    toDark: 'Switch to dark theme',
+    backTop: 'The Shepherd, back to the top',
+    logoAlt: 'The Shepherd logo',
+    viewLarger: 'View larger',
+  },
+  nav: {
+    sanctuary: 'Sanctuary',
+    motifs: 'Motifs',
+    process: 'Process',
+    wall: 'Exhibition',
+    pope: 'His Holiness',
+    archive: 'Archive',
+    contact: 'Contact',
+  },
+  hero: {
+    label: 'Introduction',
+    ar: 'الراعي للمشغولات القبطية',
+    titleA: 'Coptic woodwork',
+    titleB: 'for the churches of Egypt',
+    alt: 'The nave of a church with carved oak pews and a coffered ceiling, looking down the aisle to the sanctuary',
+    caption: 'The nave, looking down the aisle toward the sanctuary: pews, panelling and coffered ceiling in carved oak.',
+  },
+  statement: {
+    label: 'About the work',
+    text: 'Screens, altars, doors and ceilings for the Coptic church. Drawn on paper, cut from solid wood, finished by hand, and built into the house of prayer.',
+  },
+  sanctuary: {
+    echo: 'الهيكل',
+    title: 'The sanctuary',
+    lede: 'The iconostasis, its royal doors, the altar and the furniture around it: the part of the church built to be looked at most closely.',
+  },
+  candle: {
+    title: 'Bring the light closer',
+    text: 'Grapes and vine leaves, cut deep enough to hold a shadow. Move across the panel to see them.',
+    alt: 'Close view of a carved vine scroll with bunches of grapes, cut in pale wood',
+  },
+  motifs: {
+    echo: 'لغة من الرموز',
+    title: 'A vocabulary of signs',
+    lede: 'Coptic carving speaks in a small set of motifs, each carrying a meaning. These are the ones that return in almost every piece.',
+    items: [
+      ['The vine', 'Christ the true vine. It climbs the columns and fills every border.'],
+      ['Wheat', 'The bread of the Eucharist, carved beside the grapes of the cup.'],
+      ['The rosette', 'A flower turned into geometry, repeated across doors and panels.'],
+      ['Alpha and Omega', 'The first and last letters, set either side of the chalice.'],
+      ['The word', 'Scripture in Coptic and Arabic, cut into the same board.'],
+      ['The star', 'Eight points and eight leaves around a single centre.'],
+      ['Knotwork', 'One unbroken line, with no beginning and no end.'],
+      ['The cross', 'Braided, budded or inlaid: the cross in every form the church uses.'],
+    ] as [string, string][],
+  },
+  ceilings: {
+    echo: 'انظر إلى أعلى',
+    title: 'Look up',
+    lede: 'Coffered ceilings with inlaid crosses, pierced medallions lit from behind, and carved rings around stained-glass domes.',
+  },
+  process: {
+    echo: 'من الرسم إلى الكنيسة',
+    title: 'From drawing to church',
+    routerAlt: 'A router cutting a carved panel',
+    steps: [
+      ['Drawn', 'Every panel starts as a drawing. The cross, the vine and the border are set out on paper before any wood is cut.'],
+      ['Cut', 'The router takes the depth out of solid wood, pass after pass, following the drawing line by line.'],
+      ['Carved', 'Faces, lions and the finest edges are finished by hand, with chisels, at the bench.'],
+      ['Built in', 'Panels are stained, assembled and fitted in the church: screens, pews, ceilings and doors as one interior.'],
+    ] as [string, string][],
+  },
+  wall: {
+    echo: 'معرض',
+    title: 'The exhibition',
+    lede: 'Hundreds of finished pieces and works in progress, moving past like a procession. Scroll to set the wall in motion, and open any photograph.',
+    hint: 'Hover to pause',
+  },
+  pope: {
+    echo: 'قداسة البابا تواضروس الثاني',
+    title: 'His Holiness Pope Tawadros II',
+    sub: 'Pope of Alexandria and Patriarch of the See of Saint Mark',
+    lede: 'A film and photographs of His Holiness, kept here with reverence.',
+    play: 'Play the film',
+    filmLabel: 'Film: His Holiness Pope Tawadros II',
+    photoAlt: 'His Holiness Pope Tawadros II',
+  },
+  archive: {
+    echo: 'الأرشيف',
+    title: 'The archive',
+    lede: '{n} photographs of finished churches, single pieces and work in progress. Open any photograph to see it full size.',
+    filter: 'Filter the archive',
+    more: 'Show {n} more',
+    of: '{a} of {b}',
+  },
+  cats: {
+    all: 'Everything',
+    sanctuary: 'Sanctuaries',
+    nave: 'Naves & chapels',
+    ceiling: 'Ceilings',
+    doors: 'Doors & windows',
+    furniture: 'Altars & lecterns',
+    carving: 'Relief & carving',
+    crosses: 'Crosses',
+    icons: 'Icons',
+    workshop: 'Workshop',
+  },
+  viewer: {
+    of: 'of',
+    prev: 'Previous photograph',
+    next: 'Next photograph',
+    close: 'Close viewer',
+    strip: 'All photographs in this set',
+    label: 'Photograph {a} of {b}',
+  },
+  contact: {
+    title: 'Let’s create something enduring.',
+    lede: 'Tell us about the church, the space, and the piece you have in mind: a full iconostasis, a single lectern, a ceiling or a cross.',
+    whatsapp: 'Message on WhatsApp',
+    call: 'Call us',
+    rows: {
+      phone: 'Phone',
+      whatsapp: 'WhatsApp',
+      facebook: 'Facebook',
+      instagram: 'Instagram',
+      location: 'Workshop',
+    },
+    facebookValue: 'The Shepherd on Facebook',
+    locationValue: 'Open in Google Maps',
+    rights: 'The Shepherd for Coptic Works',
+    top: 'Back to the beginning',
+  },
+};
+
+type Strings = typeof en;
+
+const ar: Strings = {
+  meta: {
+    title: 'الراعي | أشغال خشبية قبطية لكنائس مصر',
+    description:
+      'الراعي للمشغولات القبطية: أشغال خشبية قبطية لكنائس مصر. أحجبة هياكل ومذابح ومنجليات وأسقف وأبواب وأيقونات وصلبان.',
+  },
+  brand: { name: 'الراعي', descriptor: 'للمشغولات القبطية' },
+  ui: {
+    skip: 'انتقل إلى الأرشيف',
+    sections: 'الأقسام',
+    openMenu: 'افتح القائمة',
+    closeMenu: 'أغلق القائمة',
+    langSwitch: 'English',
+    langSwitchLabel: 'View the site in English',
+    toLight: 'التبديل إلى الوضع الفاتح',
+    toDark: 'التبديل إلى الوضع الداكن',
+    backTop: 'الراعي، العودة إلى أعلى الصفحة',
+    logoAlt: 'شعار الراعي',
+    viewLarger: 'عرض بحجم أكبر',
+  },
+  nav: {
+    sanctuary: 'الهيكل',
+    motifs: 'الرموز',
+    process: 'مراحل العمل',
+    wall: 'المعرض',
+    pope: 'قداسة البابا',
+    archive: 'الأرشيف',
+    contact: 'تواصل معنا',
+  },
+  hero: {
+    label: 'مقدمة',
+    ar: 'The Shepherd For Coptic Works',
+    titleA: 'أشغال خشبية قبطية',
+    titleB: 'لكنائس مصر',
+    alt: 'صحن كنيسة بدكك من البلوط المحفور وسقف مقسّم، والنظر يتجه عبر الممر إلى الهيكل',
+    caption: 'صحن الكنيسة، والنظر يمتد عبر الممر إلى الهيكل: دكك وتجاليد وسقف مقسّم من البلوط المحفور.',
+  },
+  statement: {
+    label: 'عن أعمالنا',
+    text: 'أحجبة هياكل ومذابح وأبواب وأسقف للكنيسة القبطية. تُرسم على الورق، وتُحفر في الخشب الصلب، وتُشطَّب باليد، ثم تُبنى في بيت الصلاة.',
+  },
+  sanctuary: {
+    echo: 'The sanctuary',
+    title: 'الهيكل',
+    lede: 'حجاب الهيكل وأبوابه الملوكية، والمذبح وما حوله من أثاث: الجزء من الكنيسة الذي يتأمله المصلّي عن قرب أكثر من أي جزء آخر.',
+  },
+  candle: {
+    title: 'قرِّب النور',
+    text: 'عناقيد العنب وأوراق الكرمة، محفورة بعمق يحتفظ بالظل. حرّك المؤشر فوق الحشوة لتراها.',
+    alt: 'لقطة قريبة لأغصان كرمة محفورة بعناقيد العنب في خشب فاتح',
+  },
+  motifs: {
+    echo: 'A vocabulary of signs',
+    title: 'لغة من الرموز',
+    lede: 'يتحدث الحفر القبطي بمجموعة صغيرة من الرموز، لكلٍّ منها معنى. هذه هي الرموز التي تعود في كل قطعة تقريبًا.',
+    items: [
+      ['الكرمة', 'المسيح هو الكرمة الحقيقية. تتسلق الأعمدة وتملأ كل إفريز.'],
+      ['القمح', 'خبز الإفخارستيا، محفور بجوار عنب الكأس.'],
+      ['الوردة', 'زهرة صارت هندسة، تتكرر على الأبواب والحشوات.'],
+      ['الألفا والأوميجا', 'الحرف الأول والحرف الأخير، على جانبي الكأس.'],
+      ['الكلمة', 'آيات بالقبطية والعربية، محفورة في اللوح نفسه.'],
+      ['النجمة', 'ثمانية أطراف وثماني ورقات حول مركز واحد.'],
+      ['الضفيرة', 'خط واحد متصل، بلا بداية ولا نهاية.'],
+      ['الصليب', 'مضفّرًا أو مزهرًا أو مطعّمًا: الصليب بكل الأشكال التي تستخدمها الكنيسة.'],
+    ],
+  },
+  ceilings: {
+    echo: 'Look up',
+    title: 'انظر إلى أعلى',
+    lede: 'أسقف مقسّمة بصلبان مطعّمة، وميداليات مفرّغة مضاءة من خلفها، وحلقات محفورة حول قباب الزجاج المعشّق.',
+  },
+  process: {
+    echo: 'From drawing to church',
+    title: 'من الرسم إلى الكنيسة',
+    routerAlt: 'ماكينة الراوتر تحفر حشوة',
+    steps: [
+      ['الرسم', 'كل حشوة تبدأ برسم. يُخطَّط الصليب والكرمة والإطار على الورق قبل قطع أي خشب.'],
+      ['الحفر بالماكينة', 'يحفر الراوتر العمق في الخشب الصلب، طبقة بعد طبقة، متتبعًا الرسم خطًا بخط.'],
+      ['النحت اليدوي', 'الوجوه والأسود وأدق الحواف تُشطَّب باليد، بالأزاميل، على طاولة العمل.'],
+      ['التركيب', 'تُدهن الحشوات وتُجمَّع وتُركَّب في الكنيسة: الأحجبة والدكك والأسقف والأبواب كتصميم داخلي واحد.'],
+    ],
+  },
+  wall: {
+    echo: 'The exhibition',
+    title: 'المعرض',
+    lede: 'مئات القطع المكتملة والأعمال الجارية تمرّ أمامك كموكب. مرّر الصفحة لتحريك الحائط، وافتح أي صورة.',
+    hint: 'مرّر المؤشر للإيقاف',
+  },
+  pope: {
+    echo: 'His Holiness Pope Tawadros II',
+    title: 'قداسة البابا تواضروس الثاني',
+    sub: 'بابا الإسكندرية وبطريرك الكرازة المرقسية',
+    lede: 'فيديو وصور لقداسة البابا، نحتفظ بها هنا بكل توقير.',
+    play: 'تشغيل الفيديو',
+    filmLabel: 'فيديو: قداسة البابا تواضروس الثاني',
+    photoAlt: 'قداسة البابا تواضروس الثاني',
+  },
+  archive: {
+    echo: 'The archive',
+    title: 'الأرشيف',
+    lede: '{n} صورة لكنائس مكتملة وقطع منفردة وأعمال قيد التنفيذ. افتح أي صورة لتراها بالحجم الكامل.',
+    filter: 'تصفية الأرشيف',
+    more: 'اعرض {n} صورة أخرى',
+    of: '{a} من {b}',
+  },
+  cats: {
+    all: 'الكل',
+    sanctuary: 'الهياكل',
+    nave: 'صحن الكنيسة',
+    ceiling: 'الأسقف',
+    doors: 'الأبواب والنوافذ',
+    furniture: 'المذابح والمنجليات',
+    carving: 'الحفر البارز',
+    crosses: 'الصلبان',
+    icons: 'الأيقونات',
+    workshop: 'الورشة',
+  },
+  viewer: {
+    of: 'من',
+    prev: 'الصورة السابقة',
+    next: 'الصورة التالية',
+    close: 'إغلاق العارض',
+    strip: 'كل صور هذه المجموعة',
+    label: 'الصورة {a} من {b}',
+  },
+  contact: {
+    title: 'لنصنع معًا عملًا يدوم.',
+    lede: 'حدّثنا عن الكنيسة والمكان والقطعة التي تفكر فيها: حجاب هيكل كامل، أو منجلية واحدة، أو سقف، أو صليب.',
+    whatsapp: 'راسلنا على واتساب',
+    call: 'اتصل بنا',
+    rows: {
+      phone: 'الهاتف',
+      whatsapp: 'واتساب',
+      facebook: 'فيسبوك',
+      instagram: 'إنستجرام',
+      location: 'الورشة',
+    },
+    facebookValue: 'صفحة الراعي على فيسبوك',
+    locationValue: 'افتح في خرائط جوجل',
+    rights: 'الراعي للمشغولات القبطية',
+    top: 'العودة إلى البداية',
+  },
+};
+
+export const strings: Record<Lang, Strings> = { en, ar };
+export type { Strings };
+
+export const fmt = (s: string, vars: Record<string, string | number>) =>
+  s.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ''));
