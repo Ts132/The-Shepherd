@@ -58,7 +58,7 @@ export function Ceilings() {
       <div className="ceil__inner">
         <header className="ceil__head">
           <Echo text={t.ceilings.echo} />
-          <h2 id="ceil-title" className="display">
+          <h2 id="ceil-title" className="display" data-rv="title">
             {t.ceilings.title}
           </h2>
           <p className="lede">{t.ceilings.lede}</p>

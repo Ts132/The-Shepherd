@@ -91,7 +91,7 @@ export function Archive() {
       <header className="arch__head">
         <div>
           <Echo text={t.archive.echo} />
-          <h2 id="arch-title" className="display">
+          <h2 id="arch-title" className="display" data-rv="title">
             {t.archive.title}
           </h2>
           <p className="lede">{fmt(t.archive.lede, { n: num(photos.length) })}</p>
@@ -118,7 +118,7 @@ export function Archive() {
       <div className="ex" ref={grid} key={cat} style={{ ['--cols' as string]: ncols, ['--row' as string]: `${ROW}px`, ['--gap' as string]: `${GAP}px` }}>
         {colW > 0 &&
           visible.map((p, i) => {
-            const span = ncols >= 3 && isHero(p, i) ? 2 : 1;
+            const span = (ncols >= 3 && isHero(p, i)) || (ncols === 2 && p.featured && i % 7 === 0) ? 2 : 1;
             const w = colW * span + GAP * (span - 1);
             const rows = Math.max(8, Math.round((w * (p.h / p.w) + GAP) / ROW));
             return (

@@ -2652,3 +2652,399 @@ a {
     box-shadow: none;
   }
 }
+
+/* ==========================================================================
+   Mobile cinematic polish (touch layouts only)
+   Everything below is gated by `.hero--flat` or `html[data-rv]`, which exist only on touch
+   layouts without reduced motion, so desktop is untouched and content is never hidden
+   when motion is off. Transform and opacity only; no scroll handlers.
+   ========================================================================== */
+
+/* Hero: an ordinary full screen, with an opening scene ------------------------ */
+.hero--flat {
+  height: 100vh;
+  height: 100svh;
+}
+.hero--flat .hero__stage {
+  position: relative;
+}
+.hero--flat .hero__img img {
+  object-fit: cover;
+}
+.hero--flat .hero__shade {
+  opacity: 1;
+  background: linear-gradient(
+    to top,
+    rgb(var(--bg-rgb) / 0.94) 0%,
+    rgb(var(--bg-rgb) / 0.82) 30%,
+    rgb(var(--bg-rgb) / 0.5) 46%,
+    rgb(var(--bg-rgb) / 0) 66%
+  );
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* 1. the arches draw (existing), 2. the photograph settles from slightly enlarged,
+     3. the shade breathes in, 4. the headline rises line by line, 5. the sub-line, 6. the header. */
+  .hero--flat .hero__img {
+    transition: opacity 1.1s var(--ease);
+  }
+  .hero--flat .hero__img img {
+    transform: scale(1.14);
+    transition: transform 3s cubic-bezier(0.16, 0.84, 0.3, 1);
+  }
+  .hero--flat.is-img .hero__img img {
+    transform: none;
+  }
+  .hero--flat .hero__shade {
+    opacity: 0;
+    transition: opacity 1.6s ease 0.4s;
+  }
+  .hero--flat.is-img .hero__shade {
+    opacity: 1;
+  }
+  .hero--flat:not(.is-img) .hero__ar,
+  .hero--flat:not(.is-img) .hero__title span {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  .hero--flat .hero__title span {
+    transition:
+      opacity 1.1s var(--ease),
+      transform 1.3s var(--ease);
+    transition-delay: 0.9s;
+  }
+  .hero--flat .hero__title .hero__title-r {
+    transition-delay: 1.15s;
+  }
+  .hero--flat .hero__ar {
+    transition: opacity 1.1s ease 1.5s;
+  }
+  html[data-rv] .hdr {
+    animation: rv-fade 0.9s ease 2s backwards;
+  }
+}
+@keyframes rv-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Typography: titles of the older sections rise in; new-section titles rise word by word -- */
+html[data-rv] [data-rv='title'] {
+  transition:
+    opacity 1s var(--ease),
+    transform 1.2s var(--ease);
+}
+html[data-rv] [data-rv='title']:not(.is-in) {
+  opacity: 0;
+  transform: translateY(24px);
+}
+html[data-rv] .rvw {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.6em);
+  transition:
+    opacity 0.9s var(--ease),
+    transform 1.1s var(--ease);
+  transition-delay: calc(0.12s + var(--w, 0) * 80ms);
+}
+html[data-rv] .is-in .rvw {
+  opacity: 1;
+  transform: none;
+}
+
+/* Photographs: each is unveiled from an edge while its frame stays still ------------ */
+html[data-rv] [data-rv='img'] {
+  clip-path: inset(-60px -60px -80px -60px); /* the open state keeps room for the shadow */
+  transition: clip-path 1.3s var(--ease);
+}
+html[data-rv] [data-rv='img']:not(.is-in) {
+  clip-path: inset(100% -60px -80px -60px);
+}
+html[data-rv] [data-rv='img'][data-rv-dir='l']:not(.is-in) {
+  clip-path: inset(-60px 100% -80px -60px);
+}
+html[data-rv] [data-rv='img'][data-rv-dir='r']:not(.is-in) {
+  clip-path: inset(-60px -60px -80px 100%);
+}
+html[data-rv] [data-rv='img'] .shot {
+  transition: transform 1.8s var(--ease);
+}
+html[data-rv] [data-rv='img']:not(.is-in) .shot {
+  transform: scale(1.07);
+}
+/* the archive: tiles alternate sides, the featured full-width ones rise from below */
+html[data-rv] .ex__tile .shot {
+  transition:
+    clip-path 1.2s var(--ease),
+    transform 1.7s var(--ease);
+  transition-delay: inherit;
+}
+html[data-rv] .ex__tile:not(.is-in) .shot {
+  transform: scale(1.07);
+}
+html[data-rv] .ex__tile:not(.is-in):nth-child(odd) .shot {
+  clip-path: inset(0 100% 0 0);
+}
+html[data-rv] .ex__tile:not(.is-in):nth-child(even) .shot {
+  clip-path: inset(0 0 0 100%);
+}
+html[data-rv] .ex__tile--hero:not(.is-in) .shot {
+  clip-path: inset(100% 0 0 0);
+}
+
+/* About: heritage -> craftsmanship -> modern execution ------------------------------ */
+html[data-rv] .about__mark {
+  transition:
+    opacity 2s ease 0.1s,
+    transform 2.2s var(--ease) 0.1s;
+}
+html[data-rv] .about:not(.is-in) .about__mark {
+  opacity: 0;
+  transform: translateY(46px) scale(0.97);
+}
+html[data-rv] .about__head > .echo,
+html[data-rv] .about__eyebrow,
+html[data-rv] .about__sub {
+  transition:
+    opacity 0.9s var(--ease),
+    transform 1s var(--ease);
+}
+html[data-rv] .about__eyebrow {
+  transition-delay: 0.08s;
+}
+html[data-rv] .about__sub {
+  transition-delay: 0.8s;
+}
+html[data-rv] .about:not(.is-in) .about__head > .echo,
+html[data-rv] .about:not(.is-in) .about__eyebrow,
+html[data-rv] .about:not(.is-in) .about__sub {
+  opacity: 0;
+  transform: translateY(14px);
+}
+html[data-rv] .about__body p {
+  transition:
+    opacity 1.1s var(--ease),
+    transform 1.3s var(--ease);
+  transition-delay: calc(0.6s + var(--i, 0) * 0.38s);
+}
+html[data-rv] .about:not(.is-in) .about__first {
+  transform: translateY(30px); /* the opening line rises the furthest */
+}
+html[data-rv] .about:not(.is-in) .about__body p:nth-child(2) {
+  transform: translateX(-16px);
+}
+html[data-rv] .about:not(.is-in) .about__body p:nth-child(3) {
+  transform: translateY(18px);
+}
+html[dir='rtl'] .about:not(.is-in) .about__body p:nth-child(2) {
+  transform: translateX(16px);
+}
+html[data-rv] .about__body p:nth-child(n + 2) {
+  position: relative;
+  padding-inline-start: 16px;
+}
+html[data-rv] .about__body p:nth-child(n + 2)::before {
+  content: '';
+  position: absolute;
+  inset-block: 0.35em;
+  inset-inline-start: 0;
+  width: 1px;
+  background: var(--accent);
+  opacity: 0.55;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 1.1s var(--ease) calc(0.9s + var(--i, 0) * 0.38s);
+}
+html[data-rv] .about.is-in .about__body p:nth-child(n + 2)::before {
+  transform: scaleY(1);
+}
+
+/* Journey: each milestone arrives on its own: dot, number, title, text, connector ------ */
+html[data-rv] .journey__item {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+html[data-rv] .journey__item::before {
+  transition:
+    transform 0.7s var(--ease),
+    opacity 0.7s ease;
+}
+html[data-rv] .journey__item:not(.is-in)::before {
+  opacity: 0;
+  transform: scale(0.4);
+}
+html[data-rv] .journey__mark,
+html[data-rv] .journey__title,
+html[data-rv] .journey__text {
+  transition:
+    opacity 0.9s var(--ease),
+    transform 1s var(--ease);
+}
+html[data-rv] .journey__mark {
+  transition-delay: 0.12s;
+}
+html[data-rv] .journey__title {
+  transition-delay: 0.32s;
+}
+html[data-rv] .journey__text {
+  transition-delay: 0.52s;
+}
+html[data-rv] .journey__item:not(.is-in) .journey__mark,
+html[data-rv] .journey__item:not(.is-in) .journey__title,
+html[data-rv] .journey__item:not(.is-in) .journey__text {
+  opacity: 0;
+  transform: translateY(16px);
+}
+@media (max-width: 860px) {
+  html[data-rv] .journey__list::before {
+    display: none; /* replaced by a connector that draws from each milestone to the next */
+  }
+  html[data-rv] .journey__item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 5px;
+    top: calc(0.7rem + 12px);
+    bottom: 0;
+    width: 1px;
+    background: var(--accent);
+    opacity: 0.45;
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 1.2s var(--ease-io) 0.45s;
+  }
+  html[data-rv] .journey__item.is-in::after {
+    transform: scaleY(1);
+  }
+}
+
+/* Churches: an archive index; the hairline draws, then the number, then the name ------- */
+html[data-rv] .churches__row {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  border-bottom-color: transparent;
+}
+html[data-rv] .churches__row::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--line);
+  transform: scaleX(0);
+  transform-origin: right; /* the list is right-to-left: it draws from the number's side */
+  transition: transform 1.1s var(--ease);
+}
+html[data-rv] .churches__row.is-in::before {
+  transform: scaleX(1);
+}
+html[data-rv] .churches__n,
+html[data-rv] .churches__name {
+  transition:
+    opacity 0.8s var(--ease),
+    transform 0.9s var(--ease);
+}
+html[data-rv] .churches__n {
+  transition-delay: 0.25s;
+}
+html[data-rv] .churches__name {
+  transition-delay: 0.45s;
+}
+html[data-rv] .churches__row:not(.is-in) .churches__n {
+  opacity: 0;
+  transform: translateX(10px);
+}
+html[data-rv] .churches__row:not(.is-in) .churches__name {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Services: idea -> execution; number, title, text, then the photograph from alternating sides */
+html[data-rv] .services__head > .echo,
+html[data-rv] .services__head > .lede {
+  transition:
+    opacity 0.9s var(--ease),
+    transform 1s var(--ease);
+}
+html[data-rv] .services__head > .lede {
+  transition-delay: 0.7s;
+}
+html[data-rv] .services__head:not(.is-in) > .echo,
+html[data-rv] .services__head:not(.is-in) > .lede {
+  opacity: 0;
+  transform: translateY(14px);
+}
+html[data-rv] .services__path li {
+  transition: opacity 0.7s ease calc(0.9s + var(--i, 0) * 80ms);
+}
+html[data-rv] .services__head:not(.is-in) .services__path li {
+  opacity: 0;
+}
+html[data-rv] .services__row {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  border-bottom-color: transparent;
+}
+html[data-rv] .services__row::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--line);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.3s var(--ease-io) 0.1s;
+}
+html[dir='rtl'] .services__row::after {
+  transform-origin: right;
+}
+html[data-rv] .services__row.is-in::after {
+  transform: scaleX(1);
+}
+html[data-rv] .services__row {
+  position: relative;
+}
+html[data-rv] .services__n,
+html[data-rv] .services__title,
+html[data-rv] .services__text {
+  transition:
+    opacity 0.9s var(--ease),
+    transform 1s var(--ease);
+}
+html[data-rv] .services__title {
+  transition-delay: 0.18s;
+}
+html[data-rv] .services__text {
+  transition-delay: 0.36s;
+}
+html[data-rv] .services__row:not(.is-in) .services__n {
+  opacity: 0;
+  transform: translateX(-14px);
+}
+html[dir='rtl'] .services__row:not(.is-in) .services__n {
+  transform: translateX(14px);
+}
+html[data-rv] .services__row:not(.is-in) .services__title,
+html[data-rv] .services__row:not(.is-in) .services__text {
+  opacity: 0;
+  transform: translateY(18px);
+}
+html[data-rv] .services__fig {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.3s var(--ease) 0.45s;
+}
+html[data-rv] .services__row:not(.is-in) .services__fig[data-side='l'] {
+  clip-path: inset(0 100% 0 0);
+}
+html[data-rv] .services__row:not(.is-in) .services__fig[data-side='r'] {
+  clip-path: inset(0 0 0 100%);
+}
+html[data-rv] .services__fig .shot {
+  transition: transform 1.8s var(--ease) 0.45s;
+}
+html[data-rv] .services__row:not(.is-in) .services__fig .shot {
+  transform: scale(1.08);
+}

@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { useInView } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
 import { Echo } from './Echo';
+import { Words } from './Words';
 
 const delay = (i: number): CSSProperties => ({ ['--i' as string]: i }) as CSSProperties;
 
@@ -19,7 +20,7 @@ export function About() {
         <Echo text={a.echo} />
         <p className="about__eyebrow">{a.title}</p>
         <h2 id="about-title" className="display display--sm">
-          {a.heading}
+          <Words text={a.heading} />
         </h2>
         <p className="about__sub">{a.sub}</p>
       </header>

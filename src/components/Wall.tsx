@@ -41,7 +41,7 @@ export function Wall() {
     <section id="wall" className={`wall ${reduced ? 'wall--still' : ''}`} aria-labelledby="wall-title">
       <header className="wall__head">
         <Echo text={t.wall.echo} />
-        <h2 id="wall-title" className="display">
+        <h2 id="wall-title" className="display" data-rv="title">
           {t.wall.title}
         </h2>
         <p className="lede">{t.wall.lede}</p>

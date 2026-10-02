@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { byId } from '../content/photos';
-import { stableVh, stableVw, subscribeViewport, useMediaQuery, useReducedMotion, useSectionProgress } from '../lib/motion';
+import { stableVh, stableVw, subscribeViewport, useReducedMotion, useSectionProgress, useTouchLayout } from '../lib/motion';
 import { Shot } from './Shot';
 import { Echo } from './Echo';
 import { usePrefs } from '../lib/prefs';
@@ -28,8 +28,8 @@ export function Sanctuary() {
   const dist = useRef(0);
   const reduced = useReducedMotion();
   // Phones get a native swipeable strip instead of a pinned, scroll-driven track.
-  const compact = useMediaQuery('(max-width: 759px)');
-  const still = reduced || compact;
+  const touch = useTouchLayout();
+  const still = reduced || touch;
   const { t, lang, dir } = usePrefs();
   const sign = dir === 'rtl' ? 1 : -1;
 
@@ -86,13 +86,13 @@ export function Sanctuary() {
         <div className="sanct__track" ref={track}>
           <header className="sanct__intro">
             <Echo text={t.sanctuary.echo} />
-            <h2 id="sanct-title" className="display">
+            <h2 id="sanct-title" className="display" data-rv="title">
               {t.sanctuary.title}
             </h2>
             <p className="lede">{t.sanctuary.lede}</p>
           </header>
           {ITEMS.map((it, i) => (
-            <figure key={it.id} className={`sanct__item sanct__item--${it.shape}`} style={{ ['--y' as string]: `${it.y}vh` }}>
+            <figure key={it.id} data-rv="img" data-rv-dir={i % 2 ? 'r' : 'l'} className={`sanct__item sanct__item--${it.shape}`} style={{ ['--y' as string]: `${it.y}vh` }}>
               <Shot photo={photos[i]} sequence={photos} size="l" className={it.shape === 'arch' ? 'shot--arch' : ''} />
               <figcaption>{caption(photos[i], lang, t)}</figcaption>
             </figure>

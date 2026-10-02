@@ -20,7 +20,7 @@ import { Sanctuary } from './components/Sanctuary';
 import { ViewerContext } from './components/Shot';
 import { Statement } from './components/Statement';
 import { Wall } from './components/Wall';
-import { subscribe } from './lib/motion';
+import { subscribe, useTouchReveal } from './lib/motion';
 import { PrefsProvider, usePrefs } from './lib/prefs';
 
 /** A small WhatsApp button that follows the visitor once past the opening, until the contact panel is in view. */
@@ -53,6 +53,7 @@ function QuickContact() {
 function Site() {
   const [viewer, setViewer] = useState<{ list: Photo[]; index: number } | null>(null);
   const open = useCallback((list: Photo[], index: number) => setViewer({ list, index }), []);
+  useTouchReveal();
 
   return (
     <ViewerContext.Provider value={open}>

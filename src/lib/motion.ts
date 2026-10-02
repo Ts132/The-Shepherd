@@ -221,3 +221,60 @@ export function useMediaQuery(q: string) {
   }, [q]);
   return m;
 }
+
+/** Phones and touch tablets: native scrolling comes first, so no pinned or scroll-driven effects. */
+export const TOUCH_QUERY = '(max-width: 759px), (hover: none) and (pointer: coarse)';
+export const useTouchLayout = () => useMediaQuery(TOUCH_QUERY);
+
+/* ------------------------------------------------------------------ */
+/* One shared IntersectionObserver for every "reveal once" element.    */
+/* It only ever adds `is-in`; the look is pure CSS (transform/opacity),*/
+/* so there are no scroll handlers and no per-frame work.              */
+/* ------------------------------------------------------------------ */
+let revealIO: IntersectionObserver | null = null;
+export function revealOnce(el: Element) {
+  if (typeof IntersectionObserver === 'undefined') {
+    el.classList.add('is-in');
+    return () => {};
+  }
+  revealIO ??= new IntersectionObserver(
+    (entries) =>
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        revealIO?.unobserve(e.target);
+      }),
+    { threshold: 0.15, rootMargin: '0px 0px -6% 0px' },
+  );
+  revealIO.observe(el);
+  return () => revealIO?.unobserve(el);
+}
+/** Reveal every `selector` match inside `ref` once, as it first scrolls into view. */
+export function useRevealOnce(ref: RefObject<HTMLElement | null>, selector: string, enabled = true) {
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !enabled) return;
+    const offs = Array.from(root.querySelectorAll(selector), (n) => revealOnce(n));
+    return () => offs.forEach((f) => f());
+  }, [ref, selector, enabled]);
+}
+
+/**
+ * Touch layout only: switches on the mobile reveal choreography (`html[data-rv]`) and registers
+ * every `[data-rv]` element with the shared observer. With reduced motion, or no
+ * IntersectionObserver, the attribute is never set, so every element simply stays visible.
+ */
+export function useTouchReveal() {
+  const touch = useTouchLayout();
+  const reduced = useReducedMotion();
+  useEffect(() => {
+    if (!touch || reduced || typeof IntersectionObserver === 'undefined') return;
+    const html = document.documentElement;
+    html.dataset.rv = 'on';
+    const offs = Array.from(document.querySelectorAll('[data-rv]'), (n) => revealOnce(n));
+    return () => {
+      offs.forEach((f) => f());
+      delete html.dataset.rv;
+    };
+  }, [touch, reduced]);
+}

@@ -50,7 +50,7 @@ export function Motifs() {
     <section id="motifs" className="motifs" aria-labelledby="motifs-title">
       <header className="motifs__head">
         <Echo text={t.motifs.echo} />
-        <h2 id="motifs-title" className="display">
+        <h2 id="motifs-title" className="display" data-rv="title">
           {t.motifs.title}
         </h2>
         <p className="lede">{t.motifs.lede}</p>
