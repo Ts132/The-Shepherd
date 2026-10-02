@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Photo } from './content/photos';
 import { phone } from './content/site';
+import { About } from './components/About';
+import { Journey } from './components/Journey';
+import { Services } from './components/Services';
 import { Archive } from './components/Archive';
+import { Churches } from './components/Churches';
 import { Candlelight } from './components/Candlelight';
 import { Ceilings } from './components/Ceilings';
 import { Contact } from './components/Contact';
@@ -56,12 +60,16 @@ function Site() {
       <main id="top" className="page">
         <Hero />
         <Statement />
+        <About />
+        <Journey />
+        <Services />
         <Sanctuary />
         <Candlelight />
         <Motifs />
         <Ceilings />
         <Process />
         <Wall />
+        <Churches />
         <Pope />
         <Archive />
       </main>

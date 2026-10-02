@@ -33,7 +33,7 @@ export const contact: ContactRow[] = [
   { kind: 'location', value: null, href: 'https://maps.google.com/maps?q=30.0085607%2C31.1536612', external: true },
 ];
 
-export const nav = ['sanctuary', 'motifs', 'process', 'wall', 'pope', 'archive', 'contact'] as const;
+export const nav = ['about', 'services', 'sanctuary', 'motifs', 'process', 'wall', 'churches', 'pope', 'archive', 'contact'] as const;
 
 export const categoryIds = [
   'all',

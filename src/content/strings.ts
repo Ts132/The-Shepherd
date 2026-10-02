@@ -25,10 +25,13 @@ const en = {
     viewLarger: 'View larger',
   },
   nav: {
+    about: 'About',
+    services: 'Services',
     sanctuary: 'Sanctuary',
     motifs: 'Motifs',
     process: 'Process',
     wall: 'Exhibition',
+    churches: 'Churches',
     pope: 'His Holiness',
     archive: 'Archive',
     contact: 'Contact',
@@ -44,6 +47,57 @@ const en = {
   statement: {
     label: 'About the work',
     text: 'Screens, altars, doors and ceilings for the Coptic church. Drawn on paper, cut from solid wood, finished by hand, and built into the house of prayer.',
+  },
+  about: {
+    echo: 'من نحن',
+    title: 'About Us',
+    year: '1999',
+    heading: 'The Shepherd for Coptic Works',
+    sub: 'Preserving heritage. Crafting it with precision.',
+    body: [
+      'The Shepherd for Coptic Works began in 1999 as a small woodworking workshop. Over more than 25 years, it has grown into an integrated company specializing in the design, manufacturing, and installation of wooden and artistic works for churches and monasteries.',
+      'With more than 25 years of experience, we have delivered work for more than 50 churches, monasteries, and Coptic projects in Egypt and abroad.',
+      'Our work is inspired by Coptic heritage. We study historic churches and monasteries, their ornaments, details, and artistic elements, then reinterpret them with the precision required by each project.',
+    ],
+  },
+  journey: {
+    echo: 'الرحلة',
+    title: 'The journey',
+    steps: [
+      ['1999', 'A small workshop', 'The Shepherd begins as a small woodworking workshop.'],
+      [
+        '25+ years',
+        'An integrated company',
+        'Design, manufacturing, and installation of wooden and artistic works for churches and monasteries.',
+      ],
+      [
+        '50+',
+        'Churches, monasteries and projects',
+        'Work delivered for more than 50 churches, monasteries, and Coptic projects in Egypt and abroad.',
+      ],
+      [
+        'Every project',
+        'Rooted in heritage',
+        'We study historic churches and monasteries, their ornaments, details, and artistic elements, then reinterpret them with the precision each project requires.',
+      ],
+    ],
+  },
+  services: {
+    echo: 'من الفكرة… إلى التنفيذ',
+    title: 'From Idea… to Execution',
+    lede: 'One integrated process, from design through final installation.',
+    pathLabel: 'The stages',
+    path: ['Idea', 'Design', 'Manufacturing', 'Craft', 'Finishing', 'Quality', 'Installation', 'Warranty'],
+    stages: [
+      ['Design & Engineering', 'Turning the idea into a precise design that can be built, studying the details, dimensions and requirements of each project.'],
+      ['Wood Manufacturing', 'Manufacturing wooden works from selected woods and advanced manufacturing techniques, with attention to the finest details.'],
+      ['CNC & Laser', 'Using CNC and laser technologies to execute details and ornaments with high precision and repeatability.'],
+      ['Wood Carving & Coptic Works', 'Carrying out carving, ornament and artistic detail inspired by Coptic heritage.'],
+      ['Painting & Finishing', 'Carrying out painting and final finishing suited to the nature of the design and the materials used.'],
+      ['Quality Control', 'Reviewing each stage of the work and checking the quality of execution and detail before delivery.'],
+      ['Transportation & Installation', 'Coordinating the transport of the works and their installation on site, with care for precision and for protecting the pieces during transport and installation.'],
+      ['Warranty', 'Offering a warranty on the work according to the nature of the project and the agreement relating to it.'],
+    ],
   },
   sanctuary: {
     echo: 'الهيكل',
@@ -91,6 +145,11 @@ const en = {
     title: 'The exhibition',
     lede: 'Hundreds of finished pieces and works in progress, moving past like a procession. Scroll to set the wall in motion, and open any photograph.',
     hint: 'Hover to pause',
+  },
+  churches: {
+    echo: 'الكنائس',
+    title: 'The churches',
+    lede: 'The churches and projects of The Shepherd.',
   },
   pope: {
     echo: 'قداسة البابا تواضروس الثاني',
@@ -171,10 +230,13 @@ const ar: Strings = {
     viewLarger: 'عرض بحجم أكبر',
   },
   nav: {
+    about: 'من نحن',
+    services: 'الخدمات',
     sanctuary: 'الهيكل',
     motifs: 'الرموز',
     process: 'مراحل العمل',
     wall: 'المعرض',
+    churches: 'الكنائس',
     pope: 'قداسة البابا',
     archive: 'الأرشيف',
     contact: 'تواصل معنا',
@@ -190,6 +252,57 @@ const ar: Strings = {
   statement: {
     label: 'عن أعمالنا',
     text: 'أحجبة هياكل ومذابح وأبواب وأسقف للكنيسة القبطية. تُرسم على الورق، وتُحفر في الخشب الصلب، وتُشطَّب باليد، ثم تُبنى في بيت الصلاة.',
+  },
+  about: {
+    echo: 'About Us',
+    title: 'من نحن',
+    year: '1999',
+    heading: 'مؤسسة الراعي للمشغولات القبطية',
+    sub: 'نحفظ التراث… ونصنعه بإتقان',
+    body: [
+      'بدأت مؤسسة الراعي للمشغولات القبطية عام 1999 كورشة صغيرة للأعمال الخشبية، ومع مرور أكثر من 25 عامًا تطورت لتصبح مؤسسة متكاملة متخصصة في تصميم وتصنيع وتنفيذ الأعمال الخشبية والفنية للكنائس والأديرة.',
+      'نمتلك خبرة تمتد لأكثر من 25 عامًا، ونفذنا أعمالًا لأكثر من 50 كنيسة وديرًا ومشروعًا قبطيًا داخل مصر وخارجها.',
+      'نستلهم أعمالنا من التراث القبطي، وندرس الكنائس والأديرة التاريخية وما تحمله من زخارف وتفاصيل وعناصر فنية، ثم نعيد تقديمها بدقة تتناسب مع طبيعة كل مشروع واحتياجاته.',
+    ],
+  },
+  journey: {
+    echo: 'The journey',
+    title: 'الرحلة',
+    steps: [
+      ['1999', 'ورشة صغيرة', 'بدأت مؤسسة الراعي كورشة صغيرة للأعمال الخشبية.'],
+      [
+        'أكثر من 25 عامًا',
+        'مؤسسة متكاملة',
+        'تصميم وتصنيع وتنفيذ الأعمال الخشبية والفنية للكنائس والأديرة.',
+      ],
+      [
+        'أكثر من 50',
+        'كنائس وأديرة ومشروعات',
+        'أعمال نُفذت لأكثر من 50 كنيسة وديرًا ومشروعًا قبطيًا داخل مصر وخارجها.',
+      ],
+      [
+        'في كل مشروع',
+        'متجذرة في التراث',
+        'ندرس الكنائس والأديرة التاريخية وما تحمله من زخارف وتفاصيل وعناصر فنية، ثم نعيد تقديمها بدقة تتناسب مع طبيعة كل مشروع.',
+      ],
+    ],
+  },
+  services: {
+    echo: 'From Idea… to Execution',
+    title: 'من الفكرة… إلى التنفيذ',
+    lede: 'عملية متكاملة، من التصميم حتى التركيب النهائي.',
+    pathLabel: 'مراحل العمل',
+    path: ['الفكرة', 'التصميم', 'التصنيع', 'الحفر', 'التشطيب', 'الجودة', 'التركيب', 'الضمان'],
+    stages: [
+      ['التصميم والهندسة', 'تحويل الفكرة إلى تصميم دقيق قابل للتنفيذ، مع دراسة التفاصيل والأبعاد ومتطلبات كل مشروع.'],
+      ['تصنيع الأعمال الخشبية', 'تصنيع الأعمال الخشبية باستخدام أخشاب مختارة وتقنيات تصنيع متقدمة، مع الاهتمام بأدق التفاصيل.'],
+      ['CNC & Laser', 'استخدام تقنيات CNC والليزر لتنفيذ التفاصيل والزخارف بدقة وتكرارية عالية.'],
+      ['الحفر والأعمال القبطية', 'تنفيذ أعمال الحفر والزخارف والتفاصيل الفنية المستوحاة من التراث القبطي.'],
+      ['الدهانات والتشطيبات', 'تنفيذ أعمال الدهانات والتشطيبات النهائية بما يتناسب مع طبيعة التصميم والخامات المستخدمة.'],
+      ['مراقبة الجودة', 'مراجعة مراحل العمل والتأكد من جودة التنفيذ والتفاصيل قبل التسليم.'],
+      ['النقل والتركيب', 'تنسيق نقل الأعمال وتركيبها في الموقع مع الاهتمام بالدقة والحفاظ على القطع أثناء النقل والتركيب.'],
+      ['الضمان', 'تقديم ضمان على الأعمال وفقًا لطبيعة المشروع والاتفاق المتعلق به.'],
+    ],
   },
   sanctuary: {
     echo: 'The sanctuary',
@@ -237,6 +350,11 @@ const ar: Strings = {
     title: 'المعرض',
     lede: 'مئات القطع المكتملة والأعمال الجارية تمرّ أمامك كموكب. مرّر الصفحة لتحريك الحائط، وافتح أي صورة.',
     hint: 'مرّر المؤشر للإيقاف',
+  },
+  churches: {
+    echo: 'The churches',
+    title: 'الكنائس',
+    lede: 'كنائس ومشروعات مؤسسة الراعي.',
   },
   pope: {
     echo: 'His Holiness Pope Tawadros II',
