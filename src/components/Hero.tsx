@@ -1,7 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { byId, src } from '../content/photos';
 import { easeInOut, lerp, range, stableVh, stableVw, subscribeViewport, useReducedMotion, useSectionProgress, useTouchLayout } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
+import { Words } from './Words';
 
 const HERO = byId('w726');
 
@@ -132,7 +133,7 @@ export function Hero() {
       aria-label={t.hero.label}
     >
       <div className="hero__stage" key={flat ? 'flat' : 'full'}>
-        <div className="hero__img" ref={img} style={flat ? undefined : { clipPath: initialClip }}>
+        <div className="hero__img" ref={img} style={flat ? ({ ['--clip0']: initialClip } as CSSProperties) : { clipPath: initialClip }}>
           <img
             ref={imgInner}
             style={flat ? { left: 0, top: 0, width: '100%', height: '100%' } : geo ? { left: geo.cx - geo.iw * 0.58, top: geo.by - geo.ih, width: geo.iw * 1.16, height: geo.ih } : undefined}
@@ -170,11 +171,15 @@ export function Hero() {
 
         <div className="hero__words" ref={words}>
           <p className="hero__ar" lang={lang === 'en' ? 'ar' : 'en'} dir={lang === 'en' ? 'rtl' : 'ltr'}>
-            {t.hero.ar}
+            <Words text={t.hero.ar} />
           </p>
           <h1 className="hero__title">
-            <span className="hero__title-l">{t.hero.titleA}</span>
-            <span className="hero__title-r">{t.hero.titleB}</span>
+            <span className="hero__title-l">
+              <Words text={t.hero.titleA} />
+            </span>
+            <span className="hero__title-r">
+              <Words text={t.hero.titleB} />
+            </span>
           </h1>
           <div className="hero__cue" aria-hidden="true">
             <span />

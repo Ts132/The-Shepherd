@@ -1,6 +1,8 @@
-import { useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { contact, phone, type ContactKind } from '../content/site';
+import { useTouchLayout } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
+import { Words } from './Words';
 import { IconCamera, IconPage, IconPhone, IconPin, IconWhatsApp } from './Icons';
 
 const icons: Record<ContactKind, ReactNode> = {
@@ -41,19 +43,41 @@ function Magnetic({ href, className, children, external }: { href: string; class
 
 export function Contact() {
   const { t, lang } = usePrefs();
+  const root = useRef<HTMLElement>(null);
+  const touch = useTouchLayout();
+
+  // Touch: the closing scene plays when the page lifts away (the end-of-page marker comes into view)
+  // and replays on a revisit. With no observer it simply shows.
+  useEffect(() => {
+    const el = root.current;
+    if (!el || !touch) return;
+    const end = document.getElementById('page-end');
+    if (!end || typeof IntersectionObserver === 'undefined') {
+      el.classList.add('is-in');
+      return;
+    }
+    // The root is extended far upward, so "the end of the page is above me" counts as reached:
+    // the scene still plays after a jump to the bottom, and resets when the visitor goes back up.
+    const io = new IntersectionObserver(([e]) => el.classList.toggle('is-in', e.isIntersecting), {
+      rootMargin: '100000px 0px 30% 0px',
+    });
+    io.observe(end);
+    return () => io.disconnect();
+  }, [touch]);
+
   const year = new Intl.NumberFormat(lang === 'ar' ? 'ar-EG' : 'en-GB', { useGrouping: false }).format(new Date().getFullYear());
   const valueFor = (kind: ContactKind, value: string | null) =>
     value ?? (kind === 'facebook' ? t.contact.facebookValue : kind === 'location' ? t.contact.locationValue : '');
 
   return (
-    <footer id="contact" className="contact" aria-labelledby="contact-title">
+    <footer id="contact" ref={root} className="contact" aria-labelledby="contact-title">
       <div className="contact__inner">
         <span className="contact__omega" aria-hidden="true" lang="cop">
           Ⲱ
         </span>
         <div className="contact__main">
           <h2 id="contact-title" className="contact__title">
-            {t.contact.title}
+            <Words text={t.contact.title} />
           </h2>
           <p className="contact__lede">{t.contact.lede}</p>
           <div className="contact__actions">
@@ -66,8 +90,8 @@ export function Contact() {
           </div>
         </div>
         <ul className="contact__list">
-          {contact.map((c) => (
-            <li key={c.kind}>
+          {contact.map((c, i) => (
+            <li key={c.kind} style={{ ['--i' as string]: i } as CSSProperties}>
               <a
                 className="contact__row"
                 href={c.href}

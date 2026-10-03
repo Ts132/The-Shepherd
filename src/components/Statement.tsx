@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { range, useReducedMotion, useSectionProgress } from '../lib/motion';
+import { useRef, type CSSProperties } from 'react';
+import { range, useReducedMotion, useSectionProgress, useTouchLayout } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
 
 export function Statement() {
@@ -7,6 +7,9 @@ export function Statement() {
   const words = useRef<HTMLSpanElement[]>([]);
   const alpha = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotion();
+  // Touch: not pinned. The sentence lights up word by word when it arrives (CSS), instead of tracking scroll.
+  const touch = useTouchLayout();
+  const still = reduced || touch;
   const { t } = usePrefs();
   const list = t.statement.text.split(' ');
   words.current.length = list.length;
@@ -22,11 +25,11 @@ export function Statement() {
       });
       if (alpha.current) alpha.current.style.transform = `translateY(${(0.5 - p) * 60}px)`;
     },
-    !reduced,
+    !still,
   );
 
   return (
-    <section ref={section} className={`statement ${reduced ? 'statement--still' : ''}`} aria-label={t.statement.label}>
+    <section ref={section} data-rv="scene" className={`statement ${still ? 'statement--still' : ''}`} aria-label={t.statement.label}>
       <div className="statement__stage">
         <span className="statement__alpha" ref={alpha} aria-hidden="true" lang="cop">
           Ⲁ
@@ -35,6 +38,7 @@ export function Statement() {
           {list.map((w, i) => (
             <span
               key={i}
+              style={{ ['--w']: i } as CSSProperties}
               ref={(el) => {
                 if (el) words.current[i] = el;
               }}

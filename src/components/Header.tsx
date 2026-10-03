@@ -13,7 +13,7 @@ function Toggles({ className = '' }: { className?: string }) {
         className="toggle toggle--lang"
         onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
         aria-label={t.ui.langSwitchLabel}
-        lang={lang === 'en' ? 'ar' : 'en'}
+        lang="ar" // the label is Arabic in both languages: the Arabic name in English mode, 'الإنجليزية' in Arabic mode
       >
         {t.ui.langSwitch}
       </button>

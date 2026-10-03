@@ -21,13 +21,23 @@ export function Journey() {
         </h2>
       </header>
       <ol className="journey__list" ref={list}>
-        {t.journey.steps.map(([mark, title, text], i) => (
+        {t.journey.steps.map(([mark, title, text], i) => {
+          // the figure already in the milestone's own label (1999, 25+, 50+), enlarged as an architectural backdrop
+          const n = mark.match(/\d+/)?.[0];
+          const big = n ? n + (/\+|أكثر/.test(mark) ? '+' : '') : null;
+          return (
           <li key={mark} className="journey__item" style={{ ['--i' as string]: i } as CSSProperties}>
+            {big && (
+              <span className="journey__big" aria-hidden="true">
+                {big}
+              </span>
+            )}
             <span className="journey__mark">{mark}</span>
             <h3 className="journey__title">{title}</h3>
             <p className="journey__text">{text}</p>
           </li>
-        ))}
+          );
+        })}
       </ol>
     </section>
   );

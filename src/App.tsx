@@ -73,6 +73,7 @@ function Site() {
         <Churches />
         <Pope />
         <Archive />
+        <div id="page-end" aria-hidden="true" />
       </main>
       <Contact />
       <QuickContact />

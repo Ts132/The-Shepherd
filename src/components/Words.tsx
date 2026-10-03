@@ -1,8 +1,11 @@
+import type { CSSProperties } from 'react';
 import { useTouchLayout } from '../lib/motion';
 
 /**
- * A heading whose words rise in one after another on touch layouts (the parent gets `is-in`).
- * Words, never letters: Arabic keeps its shaping and RTL order. Elsewhere it is plain text.
+ * Text whose words rise through a clipping mask, one after another, on touch layouts
+ * (the nearest `.is-in` ancestor, or the Hero's `.is-img`, starts it). Words, never letters:
+ * Arabic keeps its shaping and RTL order. Each word gets a slightly different duration.
+ * Elsewhere it is plain text.
  */
 export function Words({ text }: { text: string }) {
   const touch = useTouchLayout();
@@ -11,8 +14,10 @@ export function Words({ text }: { text: string }) {
     <>
       {text.split(' ').map((w, i, all) => (
         <span key={i}>
-          <span className="rvw" style={{ ['--w' as string]: i }}>
-            {w}
+          <span className="rvm">
+            <span className="rvm__i" style={{ ['--w']: i, ['--dv']: `${((i * 7) % 4) * 0.09}s` } as CSSProperties}>
+              {w}
+            </span>
           </span>
           {i < all.length - 1 ? ' ' : ''}
         </span>

@@ -4,6 +4,7 @@ import { popeFilm, popePhotoIds } from '../content/pope';
 import { useInView } from '../lib/motion';
 import { usePrefs } from '../lib/prefs';
 import { Echo } from './Echo';
+import { Words } from './Words';
 import { Shot } from './Shot';
 
 const base = import.meta.env.BASE_URL;
@@ -35,7 +36,7 @@ export function Pope() {
       <header className="pope__head">
         <Echo text={t.pope.echo} />
         <h2 id="pope-title" className="pope__title">
-          {t.pope.title}
+          <Words text={t.pope.title} />
         </h2>
         <p className="pope__sub">{t.pope.sub}</p>
         <span className="pope__rule" aria-hidden="true">

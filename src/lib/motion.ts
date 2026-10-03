@@ -232,31 +232,37 @@ export const useTouchLayout = () => useMediaQuery(TOUCH_QUERY);
 /* so there are no scroll handlers and no per-frame work.              */
 /* ------------------------------------------------------------------ */
 let revealIO: IntersectionObserver | null = null;
-export function revealOnce(el: Element) {
+let earlyIO: IntersectionObserver | null = null;
+export function revealOnce(el: Element, early = false) {
   if (typeof IntersectionObserver === 'undefined') {
     el.classList.add('is-in');
     return () => {};
   }
-  revealIO ??= new IntersectionObserver(
-    (entries) =>
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        e.target.classList.add('is-in');
-        revealIO?.unobserve(e.target);
-      }),
-    { threshold: 0.15, rootMargin: '0px 0px -6% 0px' },
-  );
-  revealIO.observe(el);
-  return () => revealIO?.unobserve(el);
+  const make = (margin: string, threshold: number) => {
+    const io: IntersectionObserver = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add('is-in');
+          io.unobserve(e.target);
+        }),
+      { threshold, rootMargin: margin },
+    );
+    return io;
+  };
+  // `early` starts the scene while it is still entering, so one shot overlaps the one before it
+  const io = early ? (earlyIO ??= make('0px 0px 22% 0px', 0.02)) : (revealIO ??= make('0px 0px -6% 0px', 0.15));
+  io.observe(el);
+  return () => io.unobserve(el);
 }
 /** Reveal every `selector` match inside `ref` once, as it first scrolls into view. */
-export function useRevealOnce(ref: RefObject<HTMLElement | null>, selector: string, enabled = true) {
+export function useRevealOnce(ref: RefObject<HTMLElement | null>, selector: string, enabled = true, early = false) {
   useEffect(() => {
     const root = ref.current;
     if (!root || !enabled) return;
-    const offs = Array.from(root.querySelectorAll(selector), (n) => revealOnce(n));
+    const offs = Array.from(root.querySelectorAll(selector), (n) => revealOnce(n, early));
     return () => offs.forEach((f) => f());
-  }, [ref, selector, enabled]);
+  }, [ref, selector, enabled, early]);
 }
 
 /**

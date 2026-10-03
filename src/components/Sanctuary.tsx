@@ -78,7 +78,7 @@ export function Sanctuary() {
     <section
       id="sanctuary"
       ref={section}
-      className={`sanct ${still ? 'sanct--still' : ''}`}
+      className={`sanct ${still ? 'sanct--still' : ''} ${touch ? 'sanct--stack' : ''}`}
       style={{ height: still ? undefined : height }}
       aria-labelledby="sanct-title"
     >
@@ -92,7 +92,17 @@ export function Sanctuary() {
             <p className="lede">{t.sanctuary.lede}</p>
           </header>
           {ITEMS.map((it, i) => (
-            <figure key={it.id} data-rv="img" data-rv-dir={i % 2 ? 'r' : 'l'} className={`sanct__item sanct__item--${it.shape}`} style={{ ['--y' as string]: `${it.y}vh` }}>
+            <figure
+              key={it.id}
+              data-rv="plate"
+              data-plate={['a', 'b', 'c'][i % 3]}
+              data-side={i % 2 ? 'r' : 'l'}
+              data-orient={photos[i].w >= photos[i].h ? 'landscape' : 'portrait'}
+              className={`sanct__item sanct__item--${it.shape}`}
+              // On touch the frame follows the photograph: its own proportions, with at most ~11% trimmed
+              // (frame ratio = photo ratio / 1.12), so no photograph is forced into a frame that is not its own.
+              style={{ ['--y' as string]: `${it.y}vh`, ['--ar' as string]: (photos[i].w / photos[i].h / 1.12).toFixed(3) }}
+            >
               <Shot photo={photos[i]} sequence={photos} size="l" className={it.shape === 'arch' ? 'shot--arch' : ''} />
               <figcaption>{caption(photos[i], lang, t)}</figcaption>
             </figure>

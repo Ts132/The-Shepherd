@@ -27,6 +27,7 @@ export function Archive() {
   const grid = useRef<HTMLDivElement>(null);
   const sentinel = useRef<HTMLDivElement>(null);
   const [colW, setColW] = useState(0);
+  const [pad, setPad] = useState(0);
 
   const list = useMemo(() => (cat === 'all' ? interleave(photos) : photos.filter((p) => p.cat === cat)), [cat]);
   const visible = list.slice(0, shown);
@@ -41,7 +42,11 @@ export function Archive() {
     const el = grid.current;
     if (!el) return;
     const measure = () => {
-      if (el.isConnected && el.clientWidth > 0) setColW((el.clientWidth - GAP * (ncols - 1)) / ncols);
+      if (el.isConnected && el.clientWidth > 0) {
+        setColW((el.clientWidth - GAP * (ncols - 1)) / ncols);
+        // the section's side padding: a full-bleed featured photograph extends across it
+        setPad(parseFloat(getComputedStyle(el.parentElement as Element).paddingLeft) || 0);
+      }
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -119,13 +124,15 @@ export function Archive() {
         {colW > 0 &&
           visible.map((p, i) => {
             const span = (ncols >= 3 && isHero(p, i)) || (ncols === 2 && p.featured && i % 7 === 0) ? 2 : 1;
-            const w = colW * span + GAP * (span - 1);
-            const rows = Math.max(8, Math.round((w * (p.h / p.w) + GAP) / ROW));
+            const bleed = ncols === 2 && span === 2;
+            const w = colW * span + GAP * (span - 1) + (bleed ? pad * 2 : 0);
+            const h = bleed ? Math.min(w * (p.h / p.w), window.innerHeight * 0.82) : w * (p.h / p.w);
+            const rows = Math.max(8, Math.round((h + GAP) / ROW));
             return (
               <figure
                 key={p.id}
                 className={`ex__tile ${span === 2 ? 'ex__tile--hero' : ''}`}
-                style={{ gridColumn: `span ${span}`, gridRowEnd: `span ${rows}` }}
+                style={{ gridColumn: `span ${span}`, gridRowEnd: `span ${rows}`, ...(bleed ? { marginInline: -pad } : null) }}
               >
                 <Shot photo={p} sequence={list} size={span === 2 ? 'l' : 's'} className={archTop(p, i) ? 'shot--arch' : ''} />
                 <figcaption>
